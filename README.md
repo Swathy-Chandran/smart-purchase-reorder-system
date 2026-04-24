@@ -62,4 +62,6 @@ python manage.py runserver
 * Real-time analytics dashboard
 
 ---
+## 👩‍💻 Author
+Swathy Chandran N 
 
