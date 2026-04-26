@@ -1,0 +1,150 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Back Button -->
+    <div class="page-actions">
+        <a href="{% url 'product_supplier_list' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Return to List
+        </a>
+    </div>
+
+    <!-- Form Title -->
+    <h3 class="mb-4 fw-bold text-center">Add Product-Supplier Mapping</h3>
+
+    <!-- ERP-Style Form -->
+    <form method="post" class="erp-form">
+        {% csrf_token %}
+
+        <!-- Product -->
+        <div class="form-row">
+            <label>Product</label>
+            {{ form.product }}
+        </div>
+
+        <!-- Supplier -->
+        <div class="form-row">
+            <label>Supplier</label>
+            {{ form.supplier }}
+        </div>
+
+        <!-- Lead Time -->
+        <div class="form-row">
+            <label>Lead time (days)</label>
+            {{ form.lead_time_days }}
+        </div>
+
+        <!-- Supplier SKU -->
+        <div class="form-row">
+            <label>Supplier SKU</label>
+            {{ form.supplier_sku }}
+        </div>
+
+        <!-- Unit Price -->
+        <div class="form-row">
+            <label>Unit price</label>
+            {{ form.unit_price }}
+        </div>
+
+        <!-- Minimum Order Quantity -->
+        <div class="form-row">
+            <label>Minimum order qty</label>
+            {{ form.minimum_order_quantity }}
+        </div>
+
+        <!-- Preferred Supplier Checkbox -->
+        <div class="form-row">
+            <label></label>
+            <div class="checkbox-field">
+                {{ form.is_preferred }}
+                <span>Preferred supplier</span>
+            </div>
+        </div>
+
+        <!-- Active Checkbox -->
+        <div class="form-row">
+            <label></label>
+            <div class="checkbox-field">
+                {{ form.is_active }}
+                <span>Active</span>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a href="{% url 'product_supplier_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- ERP-Style CSS -->
+<style>
+.erp-form {
+    max-width: 700px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.erp-form h3 {
+    color: #2c3e50;
+}
+
+.erp-form .form-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.erp-form label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.erp-form input,
+.erp-form select {
+    max-width: 360px;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.checkbox-field span {
+    margin-left: 6px;
+    font-size: 14px;
+}
+
+.form-actions {
+    margin-top: 24px;
+    padding-left: 180px;
+}
+
+.form-actions .btn {
+    min-width: 100px;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+<div style="position: relative; height: 50px;">
+    <a href="{% url 'dashboard' %}" class="btn btn-primary" style="position: absolute; top: 0; right: 0;">
+        <i class="fas fa-arrow-left"></i> Return to Dashboard
+    </a>
+</div>
+
+<h2 class="mb-4">Consumption Report</h2><br><br>
+
+<form method="get" class="filter-form">
+    <label>Product:</label>
+    <select name="product">
+        <option value="">All</option>
+        {% for p in products %}
+            <option value="{{ p.id }}"
+                {% if request.GET.product == p.id|stringformat:"s" %}selected{% endif %}>
+                {{ p.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>From:</label>
+    <input type="date" name="from_date" value="{{ request.GET.from_date }}">
+
+    <label>To:</label>
+    <input type="date" name="to_date" value="{{ request.GET.to_date }}">
+
+    <button type="submit" class="btn btn-dark">Filter</button>
+</form>
+
+<hr>
+
+<div class="paragraph-report">
+    {% for c in consumptions %}
+        <p>
+            The consumption of <strong>{{ c.product.name }}</strong> on 
+            <strong>{{ c.date }}</strong> amounted to 
+            <strong class="qty">{{ c.quantity }}</strong> units.
+        </p>
+    {% empty %}
+        <p class="text-muted">
+            No consumption records found for the selected criteria.
+        </p>
+    {% endfor %}
+</div>
+
+<style>
+    .filter-form{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .filter-form select,
+    .filter-form input{
+        padding: 6px;
+    }
+    .paragraph-report{
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        line-height: 1.8;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        max-width: 900px;
+    }
+    .paragraph-report p{
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+    .qty{
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,770 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Purchase Reorder System{% endblock %}</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .sidebar.mobile-hidden {
+            transform: translateX(-100%);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px 30px;
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+
+        .main-content.full-width {
+            margin-left: 0;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            background: white;
+            padding: 15px 20px;
+            margin: -20px -30px 20px -30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Messages/Alerts */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s;
+        }
+
+        .alert-success {
+            background: rgba(16,185,129,0.1);
+            color: var(--secondary);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-warning {
+            background: rgba(245,158,11,0.1);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-info {
+            background: rgba(37,99,235,0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 2px solid var(--border);
+            background: #f8fafc;
+        }
+
+        .table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .table tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-primary { background: rgba(37,99,235,0.1); color: var(--primary); }
+        .badge-success { background: rgba(16,185,129,0.1); color: var(--secondary); }
+        .badge-warning { background: rgba(245,158,11,0.1); color: var(--warning); }
+        .badge-danger { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-checkbox {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .form-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-link {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s;
+        }
+
+        .page-link:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-link.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-link.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-muted { color: #64748b; }
+        .mt-1 { margin-top: 10px; }
+        .mt-2 { margin-top: 20px; }
+        .mb-1 { margin-bottom: 10px; }
+        .mb-2 { margin-bottom: 20px; }
+        .ml-auto { margin-left: auto; }
+        .d-flex { display: flex; }
+        .gap-1 { gap: 10px; }
+        .gap-2 { gap: 20px; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+        /* Sidebar user section */
+.sidebar-user {
+    margin-top: auto;               /* Push to bottom */
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* User info row */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Avatar */
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* Name + role */
+.user-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.user-role {
+    font-size: 12px;
+    color: #cbd5f5;
+}
+
+/* Logout button */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Smart Purchase Reorder System</div>
+        <!-- <div class="logo-subtitle">Smart Purchase Reorder System</div> -->
+        
+        <a href="{% url 'dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <span class="menu-icon">📊</span>
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="{% url 'product_supplier_list' %}" class="menu-item {% if 'mapping' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">🔗</span>
+            <span>Product-Supplier Mapping</span>
+        </a>
+        
+        <a href="{% url 'product_list' %}" class="menu-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">⏱️</span>
+            <span>Products & Lead Time</span>
+        </a>
+        
+        
+        <a href="{% url 'reorder' %}" class="menu-item {% if 'reorder_rule' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">🤖</span>
+            <span>Reorder Rule Engine</span>
+        </a>
+        
+        <a href="{% url 'purchase_order_list' %}" class="menu-item {% if 'purchase_request' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">📋</span>
+            <span>Purchase Order List</span>
+        </a>
+        
+        <a href="{% url 'purchase_order_create' %}" class="menu-item {% if 'purchase_order' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">📄</span>
+            <span>PO Draft Generation</span>
+        </a>
+        
+        <a href="{% url 'sales_order_create' %}" class="menu-item {% if 'pending_po' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">⏳</span>
+            <span>Sale Order</span>
+        </a>
+        
+        <a href="{% url 'supplier_list' %}" class="menu-item {% if 'supplier' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="menu-icon">🏢</span>
+            <span>Suppliers</span>
+        </a>
+<!--         
+        {% if user.is_authenticated %}
+        <div class="user-info">
+            <div class="user-name">👤 {{ user.get_full_name|default:user.username }}</div>
+            <div class="user-role">{% if user.is_superuser %}Administrator{% else %}User{% endif %}</div>
+            <a href="{% url 'logout' %}" class="menu-item {% if 'supplier' in request.resolver_match.url_name %}active{% endif %}">
+                <span class="menu-icon">⏻</span>
+                <span>Logout</span>
+            </a>
+        </div> -->
+        {% endif %}
+
+        <div class="sidebar-user">
+    <div class="user-info">
+        <div class="user-avatar">
+            👤
+        </div>
+        <div class="user-text">
+            <div class="user-name">{{request.user}}</div>
+            <div class="user-role">User</div>
+        </div>
+    </div>
+
+    <a href="{% url 'logout' %}" class="logout-btn">
+        ⏻ Logout
+    </a>
+</div>
+
+        <!-- {% if user.is_authenticated %}
+        <div class="user-info">
+            <div class="user-name">👤 {{ user.get_full_name|default:user.username }}</div>
+            <div class="user-role">{% if user.is_superuser %}Administrator{% else %}User{% endif %}</div>
+            <a href="{% url 'logout' %}" class="menu-item" style="margin-top: 10px;">
+                <span class="menu-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+        {% endif %} -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="hamburger" onclick="toggleSidebar()">☰</div>
+            <div class="logo" style="font-size: 20px; border: none; margin: 0; padding: 0;">SWATHI</div>
+        </div>
+
+        <!-- Django Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <span>
+                    {% if message.tags == 'success' %}✓{% elif message.tags == 'error' or message.tags == 'danger' %}✗{% elif message.tags == 'warning' %}⚠{% else %}ℹ{% endif %}
+                </span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle Sidebar for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelector('.messages');
+            if (messages) {
+                messages.style.opacity = '0';
+                messages.style.transition = 'opacity 0.5s';
+                setTimeout(() => messages.remove(), 500);
+            }
+        }, 5000);
+
+        // Confirm delete actions
+        function confirmDelete(message) {
+            return confirm(message || 'Are you sure you want to delete this item?');
+        }
+
+        // Show loading spinner
+        function showLoading() {
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            spinner.id = 'loadingSpinner';
+            document.body.appendChild(spinner);
+        }
+
+        function hideLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.remove();
+        }
+
+        // CSRF Token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Global AJAX setup
+        if (typeof $ !== 'undefined') {
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

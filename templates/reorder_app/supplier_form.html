@@ -1,0 +1,140 @@
+{% extends 'reorder_app/base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Back Button -->
+    <div class="page-actions">
+        <a href="{% url 'supplier_list' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Return to List
+        </a>
+    </div>
+
+    <!-- Form Title -->
+    <h3 class="mb-4 fw-bold text-center">Add Supplier</h3>
+
+    <!-- ERP-Style Form -->
+    <form method="post" class="erp-form">
+        {% csrf_token %}
+
+        <!-- Name -->
+        <div class="form-row">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-row">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-row">
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" required>
+        </div>
+
+        <!-- Address -->
+        <div class="form-row">
+            <label>Address</label>
+            <textarea name="address" class="form-control" rows="3"></textarea>
+        </div>
+
+        <!-- Performance Rating -->
+        <div class="form-row">
+            <label>Performance Rating</label>
+            <input type="number" step="0.01" name="performance_rating" class="form-control">
+        </div>
+
+        <!-- Active Checkbox -->
+        <div class="form-row checkbox-row">
+            <label></label>
+            <div class="checkbox-field">
+                <input type="checkbox" name="is_active" checked>
+                <span>Active</span>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a href="{% url 'supplier_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+<style>
+/* ERP-style form */
+.erp-form {
+    max-width: 700px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.erp-form h3 {
+    color: #2c3e50;
+}
+
+.erp-form .form-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.erp-form label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.erp-form input,
+.erp-form select,
+.erp-form textarea {
+    max-width: 360px;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.erp-form textarea {
+    height: auto;
+}
+
+.checkbox-row span {
+    margin-left: 6px;
+    font-size: 14px;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.form-actions {
+    margin-top: 24px;
+    padding-left: 180px;
+}
+
+.form-actions .btn {
+    min-width: 100px;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+</style>
+
+{% endblock %}

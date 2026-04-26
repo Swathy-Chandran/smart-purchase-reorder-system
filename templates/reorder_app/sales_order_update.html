@@ -1,0 +1,178 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Edit Sales Order (SO-{{ order.id }})</h2>
+
+        <a href="{% url 'sales_order_list' %}" class="btn btn-secondary">
+            ← Back to List
+        </a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- HEADER -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Customer</label>
+                        {{ form.customer }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Order Date</label>
+                        {{ form.order_date }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINES -->
+        <div class="card mb-3">
+            <div class="card-body p-0">
+                {{ formset.management_form }}
+
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Description</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lines">
+                        {% for line in formset %}
+                        <tr class="form-row">
+                            <td>{{ line.product }}</td>
+                            <td>{{ line.description }}</td>
+                            <td class="text-center">{{ line.quantity }}</td>
+                            <td class="text-end">{{ line.unit_price }}</td>
+
+                            <td class="text-end">
+                                <input type="text"
+                                       class="form-control subtotal-input"
+                                       readonly>
+                            </td>
+
+                            <td class="text-center">
+                                {{ line.DELETE }}
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="markRowDeleted(this)">
+                                    🗑
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ADD ROW -->
+        <button type="button" class="btn btn-link" onclick="addRow()">
+            ➕ Add Product
+        </button>
+
+        <!-- FOOTER -->
+        <div class="d-flex justify-content-between mt-4">
+            <div></div>
+
+            <div class="text-end">
+                <h5>Total</h5>
+                <h4>₹ <span id="total">0.00</span></h4>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary">
+                Update Sales Order
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- EMPTY FORM -->
+<table style="display:none;">
+    <tbody id="empty-form-template">
+        <tr class="form-row">
+            <td>{{ formset.empty_form.product }}</td>
+            <td>{{ formset.empty_form.description }}</td>
+            <td class="text-center">{{ formset.empty_form.quantity }}</td>
+            <td class="text-end">{{ formset.empty_form.unit_price }}</td>
+            <td class="text-end">
+                <input type="text" class="form-control subtotal-input" readonly>
+            </td>
+            <td class="text-center">
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        onclick="removeRow(this)">
+                    🗑
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+function calculateTotals() {
+    let total = 0;
+
+    document.querySelectorAll('.form-row').forEach(row => {
+        if (row.style.display === 'none') return;
+
+        const qty = parseFloat(row.querySelector('[name$="quantity"]')?.value) || 0;
+        const price = parseFloat(row.querySelector('[name$="unit_price"]')?.value) || 0;
+        const subtotal = qty * price;
+
+        row.querySelector('.subtotal-input').value = subtotal.toFixed(2);
+        total += subtotal;
+    });
+
+    document.getElementById('total').innerText = total.toFixed(2);
+}
+
+document.addEventListener('input', function (e) {
+    if (
+        e.target.name?.includes('quantity') ||
+        e.target.name?.includes('unit_price')
+    ) {
+        calculateTotals();
+    }
+});
+
+function addRow() {
+    const totalForms = document.getElementById('id_lines-TOTAL_FORMS');
+    const formIdx = parseInt(totalForms.value);
+
+    const template = document.getElementById('empty-form-template').innerHTML;
+    document.getElementById('lines')
+        .insertAdjacentHTML('beforeend', template.replace(/__prefix__/g, formIdx));
+
+    totalForms.value = formIdx + 1;
+}
+
+function removeRow(btn) {
+    btn.closest('tr').remove();
+    calculateTotals();
+}
+
+function markRowDeleted(btn) {
+    const row = btn.closest('tr');
+    row.querySelector('[name$="DELETE"]').checked = true;
+    row.style.display = 'none';
+    calculateTotals();
+}
+
+calculateTotals();
+</script>
+
+{% endblock %}

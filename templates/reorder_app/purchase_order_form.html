@@ -1,0 +1,254 @@
+{% extends 'reorder_app/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Back Button -->
+    <div class="page-actions">
+        <a href="{% url 'purchase_order_list' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Return to List
+        </a>
+    </div>
+
+<style>
+.po-page {
+    padding: 24px 32px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+.po-page h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.po-header-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.po-page label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.po-page input,
+.po-page select,
+.po-page textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+}
+
+.po-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.po-table thead {
+    background: #f1f5f9;
+}
+
+.po-table th,
+.po-table td {
+    padding: 10px;
+    font-size: 13px;
+}
+
+.po-table td {
+    border-top: 1px solid #e5e7eb;
+}
+
+.add-line-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 12px 0;
+}
+
+.po-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.total-box {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.po-submit-btn {
+    margin-top: 20px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+</style>
+
+<div class="po-page">
+    <h1>Create Purchase Order</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- HEADER -->
+        <div class="po-header-grid">
+            <div>
+                <label>Supplier</label>
+                {{ form.supplier }}
+            </div>
+            <div>
+                <label>Date Order</label>
+                {{ form.order_date }}
+            </div>
+            <div>
+                <label>Status</label>
+                {{ form.status }}
+            </div>
+        </div>
+
+        <h3>Products</h3>
+
+        <!-- 🔥 REQUIRED -->
+        {{ formset.management_form }}
+
+        <table class="po-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="lines">
+                {% for line in formset %}
+                <tr class="form-row">
+                    <td>{{ line.product }}</td>
+                    <td>{{ line.description }}</td>
+                    <td>{{ line.quantity }}</td>
+                    <td>{{ line.unit_price }}</td>
+                    <td class="subtotal">0.00</td>
+                    <td>
+                  {{ line.DELETE }}
+                              <button type="button" onclick="removeRow(this)">🗑</button>
+
+        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" class="add-line-btn" onclick="addRow()">+ Add a product</button>
+
+      
+          <div style="display: flex; justify-content: flex-end; font-weight: bold; font-size: 18px; margin-top: 10px;">
+    Total: ₹ <span id="total">0.00</span>
+</div>
+
+        </div>
+
+        <button type="submit" class="po-submit-btn">Create PO</button>
+    </form>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+function calculateTotals() {
+    let total = 0;
+
+    document.querySelectorAll('.form-row').forEach(row => {
+        const qty = parseFloat(row.querySelector('input[name$="quantity"]')?.value) || 0;
+        const price = parseFloat(row.querySelector('input[name$="unit_price"]')?.value) || 0;
+        const subtotal = qty * price;
+
+        row.querySelector('.subtotal').innerText = subtotal.toFixed(2);
+        total += subtotal;
+    });
+
+    document.getElementById('total').innerText = total.toFixed(2);
+}
+function addRow() {
+    const totalForms = document.getElementById('id_lines-TOTAL_FORMS');
+    const index = parseInt(totalForms.value);
+
+    const table = document.getElementById('lines');
+    const firstRow = table.querySelector('.form-row');
+
+    if (!firstRow) {
+        location.reload(); // safety fallback
+        return;
+    }
+
+    const newRow = firstRow.cloneNode(true);
+    newRow.innerHTML = newRow.innerHTML.replace(/lines-\d+/g, `lines-${index}`);
+    newRow.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type !== 'hidden' && el.type !== 'checkbox') el.value = '';
+        if (el.type === 'checkbox') el.checked = false;
+    });
+    newRow.querySelector('.subtotal').innerText = '0.00';
+
+    table.appendChild(newRow);
+    totalForms.value = index + 1;
+}
+
+function removeRow(btn) {
+    const row = btn.closest('tr');
+    const deleteInput = row.querySelector('input[type="checkbox"]');
+
+    if (deleteInput) {
+        deleteInput.checked = true;   // mark for Django
+        row.style.display = 'none';   // hide visually
+    } else {
+        row.remove();                 // only for brand new rows
+    }
+
+    calculateTotals();
+}
+
+
+document.addEventListener('input', function (e) {
+    if (
+        e.target.name.endsWith('quantity') ||
+        e.target.name.endsWith('unit_price')
+    ) {
+        calculateTotals();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', calculateTotals);
+</script>
+
+{% endblock %}

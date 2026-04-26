@@ -1,0 +1,81 @@
+{% extends 'reorder_app/base.html' %}
+{% block content %}
+
+<div class="page-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <!-- Left side button (Green) -->
+    <a href="{% url 'add_product_supplier' %}" class="btn btn-success">
+        ➕ Add Mapping
+    </a>
+
+    <!-- Right side button -->
+    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Return to Dashboard
+    </a>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Product – Supplier Mapping</h2>
+    </div>
+    
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Supplier</th>
+            <th>Lead Time (Days)</th>
+            <th>Unit Price</th>
+            <th>MOQ</th>
+            <th>Preferred</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in mappings %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ m.product }}</td>
+            <td>{{ m.supplier }}</td>
+            <td>{{ m.lead_time_days }}</td>
+            <td>₹ {{ m.unit_price }}</td>
+            <td>{{ m.minimum_order_quantity }}</td>
+            <td>
+                {% if m.is_preferred %}
+                    <span class="badge bg-success">Yes</span>
+                {% else %}
+                    <span class="badge bg-secondary">No</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if m.is_active %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </td>
+           <td>
+    <div class="d-flex gap-2 justify-content-center">
+        <a href="{% url 'update_product_supplier' m.id %}" class="btn btn-warning btn-sm">
+            Edit
+        </a>
+        <a href="{% url 'delete_product_supplier' m.id %}" class="btn btn-danger btn-sm">
+            Delete
+        </a>
+    </div>
+</td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9" class="text-center">No mappings found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

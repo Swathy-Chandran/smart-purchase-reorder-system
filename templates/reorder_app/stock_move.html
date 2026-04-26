@@ -1,0 +1,43 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+
+<h2>Purchase Orders</h2>
+
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Movement Date</th>
+            <th>Product</th>
+            <th>Stock In</th>
+            <th>Stock Out</th>
+        </tr>
+    </thead>
+
+ <tbody>
+        {% for m in movements %}
+        <tr>
+            <td>{{ m.movement_date|date:"Y-m-d H:i" }}</td>
+            <td>{{ m.product.name }}</td>
+
+            {% if m.stock_in > 0 %}
+                <td class="in">{{ m.stock_in }}</td>
+            {% else %}
+                <td class="zero">0</td>
+            {% endif %}
+
+            {% if m.stock_out > 0 %}
+                <td class="out">{{ m.stock_out }}</td>
+            {% else %}
+                <td class="zero">0</td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No stock movements found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

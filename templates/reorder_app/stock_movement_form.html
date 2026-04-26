@@ -1,0 +1,56 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+<h2>{% if movement %}Update{% else %}Create{% endif %} Stock Movement</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Product</label>
+    <select name="product" class="form-control" required>
+        {% for p in products %}
+            <option value="{{ p.id }}"
+                {% if movement and movement.product_id == p.id %}selected{% endif %}>
+                {{ p.prod_name }} (Stock: {{ p.current_stock }})
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>Movement Type</label>
+    <select name="movement_type" class="form-control" required>
+        {% for key, val in movement.MOVEMENT_TYPES %}
+            <option value="{{ key }}"
+                {% if movement and movement.movement_type == key %}selected{% endif %}>
+                {{ val }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>Quantity</label>
+    <input type="number" name="quantity" class="form-control"
+           value="{{ movement.quantity|default:'' }}" required>
+
+    <label>Reference Number</label>
+    <input type="text" name="reference_number" class="form-control"
+           value="{{ movement.reference_number|default:'' }}">
+
+    <label>Purchase Order (optional)</label>
+    <select name="purchase_order" class="form-control">
+        <option value="">---</option>
+        {% for po in purchase_orders %}
+            <option value="{{ po.id }}"
+                {% if movement and movement.purchase_order_id == po.id %}selected{% endif %}>
+                {{ po.po_number }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>Notes</label>
+    <textarea name="notes" class="form-control">{{ movement.notes }}</textarea>
+
+    <br>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{% url 'stock_movement_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

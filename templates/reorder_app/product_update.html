@@ -1,0 +1,187 @@
+{% extends 'reorder_app/base.html' %}
+{% block content %}
+<div class="page-actions">
+        <a href="{% url 'product_list' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Return to List
+        </a>
+    </div>
+<style>
+.form-page {
+    padding: 32px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+.form-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px 36px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.form-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #0f172a;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 30px;
+}
+
+.btn-primary {
+    background: #22c55e;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+</style>
+
+<div class="form-page">
+    <div class="form-card">
+
+        <div class="form-title">
+            ✏️ Update Product
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    <label>SKU</label>
+                    {{ form.sku }}
+                </div>
+
+                <div class="form-group full">
+                    <label>Category</label>
+                    {{ form.category }}
+                </div>
+
+                <div class="form-group">
+                    <label>Unit of Measure</label>
+                    {{ form.unit_of_measure }}
+                </div>
+
+                <div class="form-group">
+                    <label>Current Stock</label>
+                    {{ form.current_stock }}
+                </div>
+
+                <div class="form-group">
+                    <label>Reorder Point</label>
+                    {{ form.reorder_point }}
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Stock</label>
+                    {{ form.minimum_stock }}
+                </div>
+
+                <div class="form-group">
+                    <label>Maximum Stock</label>
+                    {{ form.maximum_stock }}
+                </div>
+
+                <div class="form-group">
+                    <label>Unit Price</label>
+                    {{ form.unit_price }}
+                </div>
+
+                <div class="form-group checkbox-row">
+                    {{ form.is_active }}
+                    <label>Active</label>
+                </div>
+
+                <div class="form-group full">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Update Product</button>
+                <a href="{% url 'product_list' %}" class="btn-secondary">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "reorder_app/base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Back Button -->
+    <div class="page-actions">
+        <a href="{% url 'purchase_request_list' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Return to List
+        </a>
+    </div>
+
+    <!-- Form Title -->
+    <h3 class="mb-4 fw-bold text-center">Create Purchase Request</h3>
+
+    <!-- ERP-Style Form -->
+    <form method="post" class="erp-form">
+        {% csrf_token %}
+
+        <!-- Product -->
+        <div class="form-row">
+            <label>Product</label>
+            {{ form.product }}
+        </div>
+
+        <!-- Supplier -->
+        <div class="form-row">
+            <label>Supplier</label>
+            {{ form.supplier }}
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-row">
+            <label>Quantity</label>
+            {{ form.quantity }}
+        </div>
+
+        <!-- Unit Price -->
+        <div class="form-row">
+            <label>Unit Price</label>
+            {{ form.unit_price }}
+        </div>
+
+        <!-- Priority -->
+        <div class="form-row">
+            <label>Priority</label>
+            {{ form.priority }}
+        </div>
+
+        <!-- Notes -->
+        <div class="form-row">
+            <label>Notes</label>
+            {{ form.notes }}
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a href="{% url 'purchase_request_list' %}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- SAME ERP-STYLE CSS (REUSED) -->
+<style>
+.erp-form {
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.erp-form .form-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.erp-form label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.erp-form input,
+.erp-form select,
+.erp-form textarea {
+    max-width: 360px;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.erp-form textarea {
+    height: auto;
+}
+
+.form-actions {
+    margin-top: 24px;
+    padding-left: 180px;
+}
+
+.form-actions .btn {
+    min-width: 100px;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+</style>
+
+{% endblock %}

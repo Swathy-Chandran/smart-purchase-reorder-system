@@ -1,0 +1,77 @@
+{% extends 'reorder_app/base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2>Sales Orders</h2>
+        <a href="{% url 'sales_order_create' %}" class="btn btn-primary">
+            + Create Sales Order
+        </a>
+    </div>
+
+    <table class="table table-borderless align-middle">
+        <thead>
+            <tr>
+                <th>SO Number</th>
+                <th>Products</th>
+                <th>Customer</th>
+                <th>Order date</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+<tbody>
+{% for order in orders %}
+<tr>
+    <!-- SO NUMBER -->
+    <td>SO-{{ order.id }}</td>
+
+    <!-- PRODUCTS -->
+    <td>
+        {% for item in order.items.all %}
+            {{ item.product }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            -
+        {% endfor %}
+    </td>
+
+    <!-- CUSTOMER -->
+    <td>{{ order.customer }}</td>
+
+    <!-- ORDER DATE -->
+    <td>{{ order.order_date }}</td>
+
+    <!-- QTY -->
+    <td>{{ order.total_qty }}</td>
+
+    <td>{{ order.unit_price }}</td>
+
+    <!-- TOTAL -->
+    <td>₹ {{ order.total_value }}</td>
+
+    <!-- ACTIONS -->
+   <td>
+    <div class="d-flex gap-2">
+        <a href="{% url 'sales_order_update' order.id %}" class="btn btn-warning btn-sm">
+            Edit
+        </a>
+        <a href="{% url 'sales_order_delete' order.id %}" 
+           class="btn btn-danger btn-sm"
+           onclick="return confirm('Are you sure you want to delete this sales order?');">
+            Delete
+        </a>
+    </div>
+</td>
+
+</tr>
+{% endfor %}
+</tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'reorde_app/base.html' %}
+{% block content %}
+
+   <h2 class="ms-3 text-center">CONSUMPTION ENTRY </h2>
+    <table class="table table-bordered border-dark align-middle border=2">
+        <tr>
+            <th>Product</th>
+            <th>Consumed Date</th>
+            <th>Consumer Quantity</th>
+            <th>Created at</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        <tbody>
+            {% for cons in consume %}
+            <tr>
+                <td>{{cons.pro_name}}</td>
+                 <td>{{cons.consumed_date}}</td>
+                  <td>{{cons.consumer_quantity}}</td>
+                   <td>{{cons.created_at}}</td>
+                 <td><a href="{% url 'update' cons.id %}" class="btn btn-primary"><i class="fas fa-eye"></i>Edit</a></td>
+             <td><a href="{% url 'delete' cons.id %}" class="btn btn-primary"><i class="fas fa-trash"></i>Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+       
+    </table>
+   <a href="{% url 'consuform' %}" class="btn btn-primary">Add</a>
+</div>
+{% endblock %}
